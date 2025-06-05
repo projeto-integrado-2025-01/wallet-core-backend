@@ -1,5 +1,6 @@
 import { CreateSingleTransactionService } from 'src/domain/transaction/use-cases/create-single-transaction.service';
-import { CreateSingleTransactionDto } from './dtos/create-single-transaction.dto';
+import { CreateSingleTransactionDto } from './dtos/create-single-transaction/create-single-transaction.dto';
+import { CreateSingleTransactionResponseDto } from './dtos/create-single-transaction/create-single-transaction-response.dto';
 
 import {
   Body,
@@ -42,7 +43,7 @@ export class CreateSingleTransactionController {
   })
   async handle(
     @Body() createSingleTransactionDto: CreateSingleTransactionDto,
-  ): Promise<any> {
+  ): Promise<CreateSingleTransactionResponseDto> {
     return this.createSingleTransactionService.execute(createSingleTransactionDto);
   }
 }
