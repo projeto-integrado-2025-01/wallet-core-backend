@@ -1,0 +1,42 @@
+services:
+  # app:
+  #   build: .
+  #   container_name: core
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     - NODE_ENV=development
+  #   command: npm run start:dev
+    # volumes:
+    #   - .:/app
+    #   - /app/node_modules
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-easyPay
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  postgres:
+    image: postgres
+    container_name: postgres-core
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: wallet-core
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  rabbitmq-data:
+  postgres-data:
