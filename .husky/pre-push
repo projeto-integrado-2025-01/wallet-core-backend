@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+. "$HOME/.nvm/nvm.sh"
+
+nvm use
+
+npm run build
