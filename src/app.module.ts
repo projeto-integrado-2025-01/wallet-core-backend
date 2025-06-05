@@ -1,19 +1,26 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TransactionModule } from './main/modules/transaction/transaction.module';
+import { dataSource } from './infra/database/datasource.config';
+import { Wallet } from './infra/entities/transaction/wallet.entity';
+import { Customer } from './infra/entities/customer/customer.entity';
+import { TransactionHistory } from './infra/entities/transaction/transaction-history.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'wallet-core',
-      entities: [__dirname + '/**/*.entity.{js,ts}'],
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      dataSourceFactory: async () => {
+        await dataSource.initialize();
+        return dataSource;
+      },
+      useFactory: () => ({}),
     }),
+    TypeOrmModule.forFeature([
+      Wallet,
+      Customer,
+      TransactionHistory,
+      
+    ]),
     TransactionModule
   ],
   controllers: [],
