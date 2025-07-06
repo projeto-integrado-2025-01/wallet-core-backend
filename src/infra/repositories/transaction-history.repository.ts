@@ -1,18 +1,12 @@
-import { Repository } from "typeorm";
-import { Wallet } from "../entities/transaction/wallet.entity";
+import { TransactionHistory } from "../entities/transaction/transaction-history.entity";
 import { dataSource } from "../database/datasource.config";
+
+import { Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
-export class TransactionHistoryRepository extends Repository<Wallet> {
+export class TransactionHistoryRepository extends Repository<TransactionHistory> {
   constructor() {
-    super(Wallet, dataSource.createEntityManager());
-  }
-
-  async findWalletByCustomerId(customerId: number): Promise<Wallet | null> {
-    return this.findOne({
-      where: { customer: { id: customerId } },
-      relations: ['customer', 'transactionsHistory'],
-    });
+    super(TransactionHistory, dataSource.createEntityManager());
   }
 }
