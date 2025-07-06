@@ -1,6 +1,6 @@
 import { WalletRepository } from "src/infra/repositories/wallet.repository";
 import { CreateSingleTransactionDto } from "src/application/controllers/transaction/dtos/create-single-transaction/create-single-transaction.dto";
-import { TransactionHistoryRepository } from "src/infra/repositories/customer.repository";
+import { TransactionHistoryRepository } from "src/infra/repositories/transaction-history.repository";
 import { Wallet } from "src/infra/entities/transaction/wallet.entity";
 
 import { randomUUID } from 'crypto';
