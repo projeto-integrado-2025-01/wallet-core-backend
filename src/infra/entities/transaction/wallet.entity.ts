@@ -2,6 +2,7 @@ import { Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { BaseOrmEntity } from "../base-orm-entity";
 import { Customer } from "../customer/customer.entity";
 import { TransactionHistory } from "./transaction-history.entity";
+import { BatchTransactionHistory } from "./batch-transaction-history.entity";
 
 @Entity('wallet')
 export class Wallet extends BaseOrmEntity {
@@ -15,4 +16,7 @@ export class Wallet extends BaseOrmEntity {
 
   @OneToMany(() => TransactionHistory, (transaction) => transaction.wallet)
   transactionsHistory: TransactionHistory[];
+
+  @OneToMany(() => BatchTransactionHistory, (batchTransaction) => batchTransaction.wallet)
+  batchTransactionsHistory: BatchTransactionHistory[];
 }
