@@ -4,11 +4,11 @@ import { CreateSingleTransactionController } from 'src/application/controllers/t
 import { CreateBatchTransactionController } from 'src/application/controllers/transaction/create-batch-transaction.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { WalletRepository } from 'src/infra/repositories/wallet.repository';
-import { TransactionHistoryRepository } from 'src/infra/repositories/customer.repository';
 import { CreateBatchTransactionService } from 'src/domain/transaction/use-cases/create-batch-transaction.service';
 import { AwsS3FileStorage } from 'src/infra/gateways/aws-s3-file-storage';
 import { BatchTransactionHistoryRepository } from 'src/infra/repositories/batch-transaction-history.repository';
 import { XlsxFileReader } from 'src/infra/gateways/xlsx-file-reader';
+import { TransactionHistoryRepository } from 'src/infra/repositories/transaction-history.repository';
 
 @Module({
   imports: [
