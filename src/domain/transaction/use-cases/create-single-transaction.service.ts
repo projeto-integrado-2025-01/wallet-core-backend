@@ -19,15 +19,19 @@ export class CreateSingleTransactionService {
   ) {}
 
   async execute(data: CreateSingleTransactionDto): Promise<CreateSingleTransactionResponseDto> {
+    const endToEndId = randomUUID();
     const userId = 1;
     const wallet = await this.getCustomerWallet(userId);
 
     await this.validadeWalletBalance(userId, data.value);
-    const transactionHistory = await this.createTransactionHistory(wallet, userId, data);
+    const transactionHistory = await this.createTransactionHistory(wallet, userId, endToEndId, data);
     await this.removeWalletBalance(wallet, data.value);
 
     await this.transactionQueue.connect();
-    this.transactionQueue.emit('SINGLE_TRANSACTION_CREATED', data);
+    this.transactionQueue.emit('SINGLE_TRANSACTION_CREATED', {
+      endToEndId,
+      ...data
+    });
 
     return CreateSingleTransactionResponseDto.toDto(transactionHistory);
   }
@@ -49,11 +53,12 @@ export class CreateSingleTransactionService {
   private async createTransactionHistory(
     wallet: Wallet,
     userId: number,
+    endToEndId: string,
     data: CreateSingleTransactionDto, 
   ): Promise<TransactionHistory> {
     const transactionHistory = this.transactionHistoryRepository.create({
       wallet,
-      endToEndId: randomUUID()
+      endToEndId
     });
     await this.transactionHistoryRepository.save(transactionHistory);
     return transactionHistory;
