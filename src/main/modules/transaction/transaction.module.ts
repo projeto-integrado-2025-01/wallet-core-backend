@@ -12,6 +12,8 @@ import { TransactionHistoryRepository } from 'src/infra/repositories/transaction
 import { JwtGuard } from 'src/domain/auth/guard/jwt.guard';
 import { CustomerRepository } from 'src/infra/repositories/customer.repository';
 import { AuthModule } from '../auth/auth.module';
+import { BalanceRepository } from 'src/infra/repositories/balance.repository';
+import { StatementRepository } from 'src/infra/repositories/statement.repository';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { AuthModule } from '../auth/auth.module';
     AwsS3FileStorage,
     BatchTransactionHistoryRepository,
     XlsxFileReader,
+    BalanceRepository,
+    StatementRepository,
   ],
 })
 export class TransactionModule {}
