@@ -3,10 +3,11 @@ import { LoginResponseDto } from "src/application/controllers/auth/dtos/login-re
 import { HashProvider } from "src/infra/gateways/hash-provider";
 import { LoginDto } from "src/application/controllers/auth/dtos/login.dto";
 import { Customer } from "src/infra/entities/customer/customer.entity";
+import { GetCustomerByIdResponseDto } from "src/application/controllers/customer/dtos/get-customer-by-id-response.dto";
+import { RequestCustomer } from "../interfaces/request-customer";
 
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { JwtService, JwtSignOptions } from "@nestjs/jwt";
-import { GetCustomerByIdResponseDto } from "src/application/controllers/customer/dtos/get-customer-by-id-response.dto";
 
 @Injectable()
 export class LoginService {
@@ -24,7 +25,7 @@ export class LoginService {
       secret: process.env.JWT_SECRET,
       expiresIn: process.env.JWT_EXPIRATION
     };
-    const payload = { cpf, password };
+    const payload: RequestCustomer = { cpf, walletId: customer.wallet.id as number };
     const jwt = await this.jwtService.signAsync(payload, options);
 
     const customerResponse = GetCustomerByIdResponseDto.toDto(customer);
@@ -37,7 +38,8 @@ export class LoginService {
 
   private async getExistingUser(cpf: string): Promise<Customer> {
     const customer = await this.customerRepository.findOne({
-      where: { document: cpf, isActive: true }
+      where: { document: cpf, isActive: true },
+      relations: ['wallet']
     });
     if(!customer) {
       throw new BadRequestException("CPF ou senha incorretos.");
