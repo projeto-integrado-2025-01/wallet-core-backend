@@ -5,7 +5,7 @@ export class HashProvider {
     return await bcrypt.hash(password, rounds);
   }
 
-  public async verifyOldPassword(
+  public async compare(
     candidate: string,
     real: string,
   ): Promise<boolean> {
