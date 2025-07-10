@@ -12,11 +12,11 @@ const baseConfig: DataSourceOptions = {
 
 const developmentConfig: DataSourceOptions = {
   ...baseConfig,
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: "localhost",
+  port: 5432,
+  username: "postgres",
+  password: "postgres",
+  database: "wallet_core",
   synchronize: true,
   logging: true,
 }
