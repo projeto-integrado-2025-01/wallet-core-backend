@@ -9,9 +9,13 @@ import { AwsS3FileStorage } from 'src/infra/gateways/aws-s3-file-storage';
 import { BatchTransactionHistoryRepository } from 'src/infra/repositories/batch-transaction-history.repository';
 import { XlsxFileReader } from 'src/infra/gateways/xlsx-file-reader';
 import { TransactionHistoryRepository } from 'src/infra/repositories/transaction-history.repository';
+import { JwtGuard } from 'src/domain/auth/guard/jwt.guard';
+import { CustomerRepository } from 'src/infra/repositories/customer.repository';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     ClientsModule.register([
       {
         name: 'TRANSACTION_SERVICE',

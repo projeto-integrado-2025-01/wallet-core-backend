@@ -7,6 +7,7 @@ import { Customer } from './infra/entities/customer/customer.entity';
 import { TransactionHistory } from './infra/entities/transaction/transaction-history.entity';
 import { CustomerModule } from './main/modules/customer/customer.module';
 import { AuthModule } from './main/modules/auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -23,6 +24,9 @@ import { AuthModule } from './main/modules/auth/auth.module';
       TransactionHistory,
       
     ]),
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
     TransactionModule,
     CustomerModule,
     AuthModule
