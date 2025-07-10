@@ -11,6 +11,8 @@ import { BalanceRepository } from "src/infra/repositories/balance.repository";
 import { randomUUID } from 'crypto';
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
+import { StatementRepository } from "src/infra/repositories/statement.repository";
+import { TrasactionStatus } from "../enums/transaction-status.enum";
 
 @Injectable()
 export class CreateBatchTransactionService {
@@ -22,6 +24,7 @@ export class CreateBatchTransactionService {
     private readonly walletRepository: WalletRepository,
     private readonly batchTransactionHistoryRepository: BatchTransactionHistoryRepository, 
     private readonly balanceRepository: BalanceRepository,
+    private readonly statementRepository: StatementRepository,
   ) {}
 
   static BATCH_TRANSACTION_FILE_EXTENSION = ".xlsx";
@@ -42,6 +45,7 @@ export class CreateBatchTransactionService {
     const queueData = this.mountQueueData();
 
     await this.createBatchTransactionHistory(wallet, queueData, fileData.transactions);
+    await this.registerStatement(wallet, fileData.transactions, queueData.endToEndId);
     await this.removeWalletBalance(wallet, fileData.totalValue);
 
     const fileName = `${queueData.fileId}${CreateBatchTransactionService.BATCH_TRANSACTION_FILE_EXTENSION}`;
@@ -55,7 +59,7 @@ export class CreateBatchTransactionService {
   private async getCustomerWallet(walletId: number): Promise<Wallet> {
     const wallet = await this.walletRepository.findOne({
       where: { id: walletId },
-      relations: ['customer', 'transactionsHistory', 'balance']
+      relations: ['customer', 'transactionsHistory', 'balance', 'statement']
     });
     if (!wallet) {
       throw new BadRequestException("Carteira não encontrada para o usuário.");
@@ -104,4 +108,16 @@ export class CreateBatchTransactionService {
       value: newBalance
     });
   }
+
+  private async registerStatement(wallet: Wallet, transactions: BatchTransactionFileRow[], endToEndId: string): Promise<void> {
+    for(const transaction of transactions) {
+      const statement = this.statementRepository.create({
+        wallet,
+        value: transaction.value,
+        status: TrasactionStatus.PENDING,
+        endToEndId
+      });
+      await this.statementRepository.save(statement);
+    }
+    }
 }

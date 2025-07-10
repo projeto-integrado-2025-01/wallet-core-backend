@@ -6,10 +6,12 @@ import { TransactionHistory } from "src/infra/entities/transaction/transaction-h
 import { CreateSingleTransactionResponseDto } from "src/application/controllers/transaction/dtos/create-single-transaction/create-single-transaction-response.dto";
 import { RequestCustomer } from "src/domain/auth/interfaces/request-customer";
 import { BalanceRepository } from "src/infra/repositories/balance.repository";
+import { StatementRepository } from "src/infra/repositories/statement.repository";
 
 import { randomUUID } from 'crypto';
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
+import { TrasactionStatus } from "../enums/transaction-status.enum";
 
 @Injectable()
 export class CreateSingleTransactionService {
@@ -19,6 +21,7 @@ export class CreateSingleTransactionService {
     private readonly walletRepository: WalletRepository,
     private readonly transactionHistoryRepository: TransactionHistoryRepository,
     private readonly balanceRepository: BalanceRepository,
+    private readonly statementRepository: StatementRepository,
   ) {}
 
   async execute(data: CreateSingleTransactionDto, customer: RequestCustomer): Promise<CreateSingleTransactionResponseDto> {
@@ -28,6 +31,7 @@ export class CreateSingleTransactionService {
     await this.validateWalletBalance(wallet, data.value);
     const transactionHistory = await this.createTransactionHistory(wallet, endToEndId, data);
     await this.removeWalletBalance(wallet, data.value);
+    await this.registerStatement(wallet, data.value, endToEndId);
 
     await this.transactionQueue.connect();
     this.transactionQueue.emit('SINGLE_TRANSACTION_CREATED', {
@@ -41,7 +45,7 @@ export class CreateSingleTransactionService {
   private async getCustomerWallet(walletId: number): Promise<Wallet> {
     const wallet = await this.walletRepository.findOne({
       where: { id: walletId },
-      relations: ['customer', 'transactionsHistory', 'balance']
+      relations: ['customer', 'transactionsHistory', 'balance', 'statement']
     });
     if (!wallet) {
       throw new BadRequestException("Carteira não encontrada para o usuário.");
@@ -76,5 +80,15 @@ export class CreateSingleTransactionService {
     await this.balanceRepository.update(balanceId, {
       value: newBalance
     });
+  }
+
+  private async registerStatement(wallet: Wallet, amount: number, endToEndId: string): Promise<void> {
+    const statement = this.statementRepository.create({
+      wallet,
+      value: amount,
+      status: TrasactionStatus.PENDING,
+      endToEndId
+    });
+    await this.statementRepository.save(statement);
   }
 }
