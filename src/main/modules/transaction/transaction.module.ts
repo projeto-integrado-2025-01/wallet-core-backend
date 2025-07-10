@@ -14,6 +14,10 @@ import { CustomerRepository } from 'src/infra/repositories/customer.repository';
 import { AuthModule } from '../auth/auth.module';
 import { BalanceRepository } from 'src/infra/repositories/balance.repository';
 import { StatementRepository } from 'src/infra/repositories/statement.repository';
+import { GetWalletBalanceController } from 'src/application/controllers/transaction/get-wallet-balance.controller';
+import { GetWalletBalanceService } from 'src/domain/transaction/use-cases/get-wallet-balance.service';
+import { GetWalletStatementController } from 'src/application/controllers/transaction/get-wallet-statement.controller';
+import { GetWalletStatementService } from 'src/domain/transaction/use-cases/get-wallet-statement.service';
 
 @Module({
   imports: [
@@ -43,7 +47,12 @@ import { StatementRepository } from 'src/infra/repositories/statement.repository
       }
     ]),
   ],
-  controllers: [CreateSingleTransactionController, CreateBatchTransactionController],
+  controllers: [
+    CreateSingleTransactionController,
+    CreateBatchTransactionController,
+    GetWalletBalanceController,
+    GetWalletStatementController,
+  ],
   providers: [
     WalletRepository,
     TransactionHistoryRepository,
@@ -54,6 +63,8 @@ import { StatementRepository } from 'src/infra/repositories/statement.repository
     XlsxFileReader,
     BalanceRepository,
     StatementRepository,
+    GetWalletBalanceService,
+    GetWalletStatementService,
   ],
 })
 export class TransactionModule {}
