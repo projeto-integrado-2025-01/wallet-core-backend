@@ -51,4 +51,13 @@ export class CreateCustomerDto {
   })
   @IsString({ message: "document deve ser uma string" })
   document: string;
+
+  @Expose()
+  @ApiProperty({
+    description: 'customer password',
+    example: 'any password',
+    required: true,
+  })
+  @IsString({ message: "password deve ser uma string" })
+  password: string;
 }

@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { CreateCustomerResponseDto } from './dtos/create-customer-response.dto';
 
 @Controller('customers')
 @ApiTags('Customers')
@@ -25,24 +26,25 @@ export class CreateCustomerController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: 'Transaction creation',
+    summary: 'Customer creation',
     description:
-      'This endpoint is responsible for creating a single transaction.',
+      'This endpoint is responsible for creating a single customer.',
   })
   @ApiOkResponse({
     description: 'Transaction Created',
+    type: CreateCustomerResponseDto
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized - invalid authentication',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid transaction data',
+    status: HttpStatus.CONFLICT,
+    description: 'Invalid customer data',
   })
   async handle(
     @Body() createCustomerDto: CreateCustomerDto,
-  ): Promise<any> {
+  ): Promise<CreateCustomerResponseDto> {
     return this.createCustomerService.execute(createCustomerDto);
   }
 }

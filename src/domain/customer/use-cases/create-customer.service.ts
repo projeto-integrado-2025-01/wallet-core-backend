@@ -4,6 +4,8 @@ import { WalletRepository } from "src/infra/repositories/wallet.repository";
 import { ConflictException, Injectable } from "@nestjs/common";
 import { CreateCustomerDto } from "src/application/controllers/customer/dtos/create-customer.dto";
 import { DataFormater } from "src/infra/gateways/dataFormater";
+import { HashProvider } from "src/infra/gateways/hash-provider";
+import { CreateCustomerResponseDto } from "src/application/controllers/customer/dtos/create-customer-response.dto";
 
 @Injectable()
 export class CreateCustomerService {
@@ -11,20 +13,23 @@ export class CreateCustomerService {
     private readonly walletRepository: WalletRepository,
     private readonly customerRepository: CustomerRepository,
     private readonly dataFormater: DataFormater,
+    private readonly hashProvider: HashProvider
   ) {}
 
-  async execute(data: CreateCustomerDto): Promise<any> {
+  async execute(data: CreateCustomerDto): Promise<CreateCustomerResponseDto> {
     this.formatData(data);
     await this.validateExistingUser(data);
 
+    const passwordHash = await this.hashProvider.handle(data.password);
     const wallet = await this.walletRepository.save({});
     const customer = this.customerRepository.create({
       ...data,
+      password: passwordHash,
       wallet
     });
     await this.customerRepository.save(customer);
 
-    return customer;
+    return CreateCustomerResponseDto.toDto(customer);
   }
 
   private formatData(data: CreateCustomerDto): void {
