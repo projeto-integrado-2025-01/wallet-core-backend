@@ -3,7 +3,6 @@ import 'dotenv/config';
 import * as path from 'path';
 
 const entitiesDir = path.join(__dirname, '../entities/**/*.entity.{js,ts}');
-console.log('entitiesDir', entitiesDir);
 
 const baseConfig: DataSourceOptions = {
   type: "postgres",
@@ -16,7 +15,7 @@ const developmentConfig: DataSourceOptions = {
   port: 5432,
   username: "postgres",
   password: "postgres",
-  database: "wallet_core",
+  database: "wallet-core",
   synchronize: true,
   logging: true,
 }
