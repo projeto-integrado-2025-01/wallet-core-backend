@@ -17,7 +17,7 @@ const developmentConfig: DataSourceOptions = {
   password: "postgres",
   database: "wallet-core",
   synchronize: true,
-  logging: true,
+  logging: false,
 }
 
 const dataSourceConfig: DataSourceOptions = developmentConfig;
