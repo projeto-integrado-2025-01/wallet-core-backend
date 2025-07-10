@@ -4,6 +4,7 @@ import { Customer } from "../customer/customer.entity";
 import { TransactionHistory } from "./transaction-history.entity";
 import { BatchTransactionHistory } from "./batch-transaction-history.entity";
 import { Balance } from "./balance.entity";
+import { Statement } from "./statement.entity";
 
 @Entity('wallet')
 export class Wallet extends BaseOrmEntity {
@@ -23,4 +24,7 @@ export class Wallet extends BaseOrmEntity {
 
   @OneToOne(() => Balance, (balance) => balance.wallet)
   balance: Balance;
+
+  @OneToMany(() => Statement, (statement) => statement.wallet)
+  statement: Statement[];
 }
