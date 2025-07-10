@@ -32,6 +32,7 @@ export class CreateSingleTransactionController {
   })
   @ApiOkResponse({
     description: 'Transaction Created',
+    type: CreateSingleTransactionResponseDto
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
