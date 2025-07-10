@@ -6,6 +6,7 @@ import { Wallet } from './infra/entities/transaction/wallet.entity';
 import { Customer } from './infra/entities/customer/customer.entity';
 import { TransactionHistory } from './infra/entities/transaction/transaction-history.entity';
 import { CustomerModule } from './main/modules/customer/customer.module';
+import { AuthModule } from './main/modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CustomerModule } from './main/modules/customer/customer.module';
     ]),
     TransactionModule,
     CustomerModule,
+    AuthModule
   ],
   controllers: [],
   providers: [],
