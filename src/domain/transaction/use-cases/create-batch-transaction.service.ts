@@ -3,13 +3,14 @@ import { WalletRepository } from "src/infra/repositories/wallet.repository";
 import { AwsS3FileStorage } from "src/infra/gateways/aws-s3-file-storage";
 import { XlsxFileReader } from "src/infra/gateways/xlsx-file-reader";
 import { Wallet } from "src/infra/entities/transaction/wallet.entity";
+import { BatchTransactionQueueData } from "../interfaces/batch-transaction-queue-data";
+import { BatchTransactionFileRow } from "../interfaces/batch-transaction-file-row";
+import { RequestCustomer } from "src/domain/auth/interfaces/request-customer";
+import { BalanceRepository } from "src/infra/repositories/balance.repository";
 
 import { randomUUID } from 'crypto';
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
-import { BatchTransactionQueueData } from "../interfaces/batch-transaction-queue-data";
-import { BatchTransactionFileRow } from "../interfaces/batch-transaction-file-row";
-import { RequestCustomer } from "src/domain/auth/interfaces/request-customer";
 
 @Injectable()
 export class CreateBatchTransactionService {
@@ -20,6 +21,7 @@ export class CreateBatchTransactionService {
     private readonly fileReader: XlsxFileReader,
     private readonly walletRepository: WalletRepository,
     private readonly batchTransactionHistoryRepository: BatchTransactionHistoryRepository, 
+    private readonly balanceRepository: BalanceRepository,
   ) {}
 
   static BATCH_TRANSACTION_FILE_EXTENSION = ".xlsx";
@@ -34,13 +36,13 @@ export class CreateBatchTransactionService {
     }): 
     Promise<any>
   {
-    const userId = 1;
-    const wallet = await this.getCustomerWallet(userId);
+    const wallet = await this.getCustomerWallet(customer.walletId);
     const fileData = this.fileReader.processFile({ file: buffer });
-    await this.validateWalletBalance(userId, fileData.totalValue);
+    await this.validateWalletBalance(wallet, fileData.totalValue);
     const queueData = this.mountQueueData();
 
-    const batchTransactionHistory = await this.createBatchTransactionHistory(wallet, queueData, fileData.transactions);
+    await this.createBatchTransactionHistory(wallet, queueData, fileData.transactions);
+    await this.removeWalletBalance(wallet, fileData.totalValue);
 
     const fileName = `${queueData.fileId}${CreateBatchTransactionService.BATCH_TRANSACTION_FILE_EXTENSION}`;
     await this.fileUploader.upload({ file: buffer, fileName });
@@ -50,16 +52,20 @@ export class CreateBatchTransactionService {
     return queueData;
   }
 
-  private async getCustomerWallet(userId: number): Promise<Wallet> {
-    const wallet = await this.walletRepository.findWalletByCustomerId(userId);
+  private async getCustomerWallet(walletId: number): Promise<Wallet> {
+    const wallet = await this.walletRepository.findOne({
+      where: { id: walletId },
+      relations: ['customer', 'transactionsHistory', 'balance']
+    });
     if (!wallet) {
       throw new BadRequestException("Carteira não encontrada para o usuário.");
     }
     return wallet;
   }
 
-  private async validateWalletBalance(userId: number, amount: number): Promise<void> {
-    if(amount > 1000) {
+  private async validateWalletBalance(wallet: Wallet, amount: number): Promise<void> {
+    const balance = wallet.balance;
+    if(amount > balance.value) {
       throw new BadRequestException("Saldo insuficiente na carteira do usuário.");
     }
   }
@@ -88,5 +94,14 @@ export class CreateBatchTransactionService {
       });
       await this.batchTransactionHistoryRepository.save(batchTransactionHistory);
     }
+  }
+
+  private async removeWalletBalance(wallet: Wallet, amount: number): Promise<void> {
+    const balanceId = wallet.balance.id as number;
+    const currentBalance = wallet.balance.value;
+    const newBalance = currentBalance - amount;
+    await this.balanceRepository.update(balanceId, {
+      value: newBalance
+    });
   }
 }
