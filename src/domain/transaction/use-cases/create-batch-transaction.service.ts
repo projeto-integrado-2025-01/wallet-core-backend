@@ -9,6 +9,7 @@ import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { BatchTransactionQueueData } from "../interfaces/batch-transaction-queue-data";
 import { BatchTransactionFileRow } from "../interfaces/batch-transaction-file-row";
+import { RequestCustomer } from "src/domain/auth/interfaces/request-customer";
 
 @Injectable()
 export class CreateBatchTransactionService {
@@ -25,9 +26,11 @@ export class CreateBatchTransactionService {
 
   async execute(
     {
-      buffer
+      buffer,
+      customer
     }: {
-      buffer: Buffer
+      buffer: Buffer,
+      customer: RequestCustomer
     }): 
     Promise<any>
   {

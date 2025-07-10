@@ -8,6 +8,7 @@ import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { TransactionHistory } from "src/infra/entities/transaction/transaction-history.entity";
 import { CreateSingleTransactionResponseDto } from "src/application/controllers/transaction/dtos/create-single-transaction/create-single-transaction-response.dto";
+import { RequestCustomer } from "src/domain/auth/interfaces/request-customer";
 
 @Injectable()
 export class CreateSingleTransactionService {
@@ -18,7 +19,7 @@ export class CreateSingleTransactionService {
     private readonly transactionHistoryRepository: TransactionHistoryRepository, 
   ) {}
 
-  async execute(data: CreateSingleTransactionDto): Promise<CreateSingleTransactionResponseDto> {
+  async execute(data: CreateSingleTransactionDto, customer: RequestCustomer): Promise<CreateSingleTransactionResponseDto> {
     const endToEndId = randomUUID();
     const userId = 1;
     const wallet = await this.getCustomerWallet(userId);
