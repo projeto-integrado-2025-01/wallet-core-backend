@@ -9,8 +9,6 @@ import { AwsS3FileStorage } from 'src/infra/gateways/aws-s3-file-storage';
 import { BatchTransactionHistoryRepository } from 'src/infra/repositories/batch-transaction-history.repository';
 import { XlsxFileReader } from 'src/infra/gateways/xlsx-file-reader';
 import { TransactionHistoryRepository } from 'src/infra/repositories/transaction-history.repository';
-import { JwtGuard } from 'src/domain/auth/guard/jwt.guard';
-import { CustomerRepository } from 'src/infra/repositories/customer.repository';
 import { AuthModule } from '../auth/auth.module';
 import { BalanceRepository } from 'src/infra/repositories/balance.repository';
 import { StatementRepository } from 'src/infra/repositories/statement.repository';
@@ -18,6 +16,8 @@ import { GetWalletBalanceController } from 'src/application/controllers/transact
 import { GetWalletBalanceService } from 'src/domain/transaction/use-cases/get-wallet-balance.service';
 import { GetWalletStatementController } from 'src/application/controllers/transaction/get-wallet-statement.controller';
 import { GetWalletStatementService } from 'src/domain/transaction/use-cases/get-wallet-statement.service';
+import { TransactionConsumerController } from 'src/application/controllers/transaction/transaction-consumer.controller';
+import { UpdateTransactionStatusEventService } from 'src/domain/transaction/use-cases/update-transaction-status-event.service';
 
 @Module({
   imports: [
@@ -52,6 +52,7 @@ import { GetWalletStatementService } from 'src/domain/transaction/use-cases/get-
     CreateBatchTransactionController,
     GetWalletBalanceController,
     GetWalletStatementController,
+    TransactionConsumerController,
   ],
   providers: [
     WalletRepository,
@@ -65,6 +66,7 @@ import { GetWalletStatementService } from 'src/domain/transaction/use-cases/get-
     StatementRepository,
     GetWalletBalanceService,
     GetWalletStatementService,
+    UpdateTransactionStatusEventService
   ],
 })
 export class TransactionModule {}
