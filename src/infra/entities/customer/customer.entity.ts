@@ -25,4 +25,7 @@ export class Customer extends BaseOrmEntity {
 
   @OneToOne(() => Wallet, (wallet) => wallet.customer)
   wallet: Wallet;
+
+  @Column({ nullable: false })
+  password: string;
 }
