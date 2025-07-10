@@ -17,6 +17,9 @@ export class Statement extends BaseOrmEntity {
   @Column({ nullable: true })
   status: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   value: number;
+
+  @Column({ nullable: true })
+  pixKey: string;
 }

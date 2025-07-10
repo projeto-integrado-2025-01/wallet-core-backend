@@ -31,7 +31,7 @@ export class CreateSingleTransactionService {
     await this.validateWalletBalance(wallet, data.value);
     const transactionHistory = await this.createTransactionHistory(wallet, endToEndId, data);
     await this.removeWalletBalance(wallet, data.value);
-    await this.registerStatement(wallet, data.value, endToEndId);
+    await this.registerStatement(wallet, data.value, endToEndId, data.pixKey);
 
     await this.transactionQueue.connect();
     this.transactionQueue.emit('SINGLE_TRANSACTION_CREATED', {
@@ -82,12 +82,13 @@ export class CreateSingleTransactionService {
     });
   }
 
-  private async registerStatement(wallet: Wallet, amount: number, endToEndId: string): Promise<void> {
+  private async registerStatement(wallet: Wallet, amount: number, endToEndId: string, pixKey: string): Promise<void> {
     const statement = this.statementRepository.create({
       wallet,
       value: amount,
       status: TrasactionStatus.PENDING,
-      endToEndId
+      endToEndId,
+      pixKey
     });
     await this.statementRepository.save(statement);
   }

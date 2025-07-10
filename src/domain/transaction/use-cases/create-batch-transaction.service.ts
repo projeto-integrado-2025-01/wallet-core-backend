@@ -115,7 +115,8 @@ export class CreateBatchTransactionService {
         wallet,
         value: transaction.value,
         status: TrasactionStatus.PENDING,
-        endToEndId
+        endToEndId,
+        pixKey: transaction.pixKey,
       });
       await this.statementRepository.save(statement);
     }
